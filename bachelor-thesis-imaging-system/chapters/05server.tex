@@ -1,0 +1,84 @@
+
+
+\chapter{The Imaging Server}\label{ch:server}
+
+Like the client, the server is a Python script called  \emph{server.py}.
+The main purpose of the server is to store the images created on the
+workstations in the network. For this, it used a hierarchy in the file
+system that stores images in binary files, with meta information in
+other files.
+
+All the images are stored in the \emph{images/} directory. For each image
+there is an unique ID with a corresponding directory with the ID as the
+name. In each ID-directory the is a \emph{info} file that contains the
+description and a directory for each disk/partition in the image. Each
+partition or disk directory has one or more directories that contain a
+version of that image-disk.
+
+\begin{lstlisting}[caption= Images directory hierarchy on the Image Server]
+images/
+|-- 1
+|   |-- info
+|   |-- sda
+|   |   |-- 1
+|   |   |-- 2
+|   |   `-- 3
+|   `-- sdb
+|       `-- 1
+|-- 10
+|   `-- info
+|-- 11
+|   `-- info
+|-- 12
+|   `-- info
+|-- 2
+|   |-- info
+|   `-- sda
+|       |-- 1
+|       |-- 2
+|       |-- 3
+|       |-- 4
+|       `-- 5
+|-- 3
+|   |-- info
+|   |-- sda1
+|   |   `-- 1
+|   `-- sda5
+|       `-- 1
+`-- 5
+    `-- info
+
+\end{lstlisting}
+
+The Image Server awaits connections from clients. Because only one image
+can be transfered at a time, only one client can connect at a time.
+
+From the clients, the following requests can be received:
+\begin{itemize}
+\item LIST
+\item CREATE
+\item UPDATE
+\item DELETE
+\item REQUEST
+\end{itemize}
+
+The LIST actions is a request to send to the client information about the
+images in the server's image database. The request can either be sent with
+a value of 0, in which case the server will send information on all the
+images, or with a value that is an ID of an image, in which case, only
+information about the specified image is sent back to the client.
+
+The CREATE, UPDATE and DELETE actions involve modifying  the image
+database. CREATE will make a new image with a new ID and a directory in the
+\emph{images/} directory, with a base version 1, while UPDATE will only
+create a new version of a partition or disk in an existing image. DELETE
+will erase an image.
+
+In the case of CREATE and UPDATE, the client will ask the server to start a
+udp-receiver process. The client has a udp-sender process started. When the
+client gives the command, the server will receive the data and store the
+sent partition or disk image in the local database.
+
+When a REQUEST command is sent, the server will provide via a udp-sender
+instance the content of a partition or disk to the upd-sender clients in
+the network.

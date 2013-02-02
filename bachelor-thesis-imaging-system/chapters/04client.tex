@@ -1,0 +1,149 @@
+
+
+\chapter{The Imaging Client}\label{ch:client}
+
+The client is represented by the \emph{client.py} Python script. The
+requirements for running it are:
+\begin{itemize}
+\item the Python interpreter installed (multi platform)
+\item the UDP Cast udp-sender and udp-receiver installed
+\end{itemize}
+
+There are several possibilities or running an Imaging Client:
+\begin{enumerate}
+\item from a locally installed operating system
+\item from a separate partition on the local system
+\item from a network boot image
+\end{enumerate}
+
+The first one is not recommended because if you want to copy the image of
+the running operating system, it's contents might change during the
+transfer and will invalidate the image.
+
+A network boot should be the best option, because a server is already in
+place and could be setup to service a \ac{PXE} image that contains the script.
+
+The Image Client has a command line interface that accepts the commands
+supported.
+
+\begin{lstlisting}[caption= Image Client CLI]
+**************************************
+*Welcome to the Imaging System Client*
+**************************************
+
+Available commands:
+l: list images on servers
+c: create image
+u: update image
+d: delete image
+r: request image
+>>
+\end{lstlisting}
+
+Each command sends a request to the Image Server to execute an action.
+
+
+\section{Image listing}
+
+The first command is a request for the server to list the stored images in
+the database. The client sends a "LIST" request and waits for the answer.
+
+If the server receives a "LIST" request, it explores the \emph{images}
+directory and it's contents. Each directory represents the ID of a system
+image. In each ID-directory the is a \emph{info} file that contains the
+description and a directory for each disk/partition in the image. Each
+partition or disk directory has one or more directories that contain a
+version of that image-disk.
+
+Based on the information in the \emph{file} and the structure of the
+directory hierarchy, the server sends a reply to the clients with the
+needed information. The Client then displays the information to the user.
+
+\section{Image Creation}
+
+The creation of an image involves work both on the client and on the
+server. 
+
+When an image in created, the Image Client must be ran on the workstation
+that contains the operating system(s) that will be imaged on the other
+hosts. The client will scan the workstation for disks and partition.
+
+A command line wizard will be started and the user will have to enter a
+description for the image.
+
+\begin{lstlisting}[caption=Image creation wizard on Image Client]
+Available commands:
+l: list images on servers
+c: create image
+u: update image
+d: delete image
+r: request image
+>>c
+ Creating image...
+Available disks:
+* sda
+   - sda5
+   - sda2
+   - sda1
+Fill in description for the image (press CTRL-D to finish reading input)
+Image for room EG306-USO (Ubuntu 10.4 Customised)
+Start transfer to server (it might take a long time)?[y/n]
+
+\end{lstlisting}
+
+The search for the devices is done using the \emph{/dev} system directory
+in Linux.
+
+
+\begin{lstlisting}[float, caption=Code snip of device listing]
+def create_image():
+	print "Creating image..."
+
+	# Searching local disks and partitions 
+	disks =  filter(re.compile("[sh]d.$").search, os.listdir("/dev"))
+	print "Available disks:"
+	for disk in disks:
+		print "*", disk
+		partitions =  filter(re.compile(disk + ".+$").search,
+os.listdir("/dev"))
+		for partition in partitions:
+			print "   -", partition
+\end{lstlisting}
+
+This information is sent to the server that prepares a new ID for the
+image. It will be considered version 1 of this image. The description is
+stored in the \emph{info} file on the server in the corresponding directory.
+
+After the devices to be copied are chosen, the client signals the server to
+start an udp-receiver process to listen for the data. After the server has
+started the process, the client start a local udp-sender with the input
+being the selected partition(s).
+
+At this point, on other workstations, Image Clients in request image mode
+or normal UDP Cast clients can be started to also receive the image. This
+saves time by both imaging all the hosts and archiving the image on the
+server.
+
+When all the receivers are connected, the transfer is started.
+
+\section{Image Update}
+
+Once an image for a workstation is on the server in an initial version, new
+versions of a disk or a partition can be uploaded to the server. The
+operation is similar to the creation, only the server does not create a new
+ID, but only listens to new data images to be stored in the same directory
+hierarchy.
+
+\section{Image Deletion}
+
+To free up space on the server old images can be deleted. The user can either
+delete an entire image entry or just a version of a disk or a partition.
+
+\section{Image Request}
+
+The image request operation is similar to what UDP Cast does as a receiver.
+A request for an image ID is send to the server, that starts a udp-sender
+process with the selected version of a disk or partition.
+
+All the workstations that need to be imaged, need to run the Image Client
+in Image Request mode or run the UDP Cast receiver.

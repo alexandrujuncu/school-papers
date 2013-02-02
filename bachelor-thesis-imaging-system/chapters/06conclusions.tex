@@ -1,0 +1,43 @@
+
+
+\chapter{Conclusions and Future Development}\label{ch:conclusions}
+
+
+The implementation of the project offers new features to the UDP Cast
+framework, making is better suited for environments such as School and
+University Computer Laboratories.
+
+The main benefit of using the proposed architecture for system imaging is
+the time saved in various situations. The costs of implementing such a
+system is very small so it is appealing to be used.
+
+The current version of the software implements the idea of a centralised
+system in a very basic way. Some of the current shortcomings, that can be
+mended in future development include:
+
+\begin{itemize}
+\item The Server can only serve one client at a time. This is because of
+the way UDP Cast works, because it was designed to have one transfer at a
+time. A modified implementation could make the server have udp-senders on
+multiple multicast addresses and by keeping track of the source address,
+more then one transfer could be made. This could lead to some
+synchronisation problems on the image database and since the resources in
+the archive are large files, locking could be an issue.
+\item The client to server requests are done without authentication. Anyone
+with a client can connect to the sever and add, remove and modify images.
+This could be secured by creating a database of users (with different
+privilege levels) and make the server ask for credentials before receiving
+any requests from clients. Furthermore, the use of SSL/TLS could make the
+control traffic immune to traffic sniffing.
+\item The Client only offers a \ac{CLI} for sending requests to the sever and
+doing any actions. A \ac{GUI} could provide a more user friendly
+environment for users.
+\item New versions of an image means copying new files to the server. These
+files are very big in size (10-100GB) and could easily occupy the server's
+disk space. A differential versioning system could reduce the file sizes by
+making version 1 a base version and only storing the differences between
+the base version and the new version on the server's disk.
+\end{itemize}
+
+
+
