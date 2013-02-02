@@ -1,0 +1,42 @@
+% vim: set tw=78 sts=2 sw=2 ts=8 aw et ai:
+
+VMchecker is an open sources project started by a group of teachers and
+students from the Computer Science Department at the Politehnica University
+of Bucharest. The goal was to automate testing of homework from the
+Operating Systems and Compilers courses. Since then, it was been adopted by
+several other courses, that had assessments ranging from high level
+programming, to network simulations to kernel programming.
+
+The architecture of VMchecker is very modular and uses several
+technologies. The infrastructure is organized in three components:
+\begin{itemize}
+\item vmchecker-ui
+\item vmchecker-storer
+\item vmchecker-tester
+\end{itemize}
+
+The \emph{User Interface} is a web interfaces based on Google Web Toolkit,
+a framework with a Java backend and a JavaScript frontend. The UI is used
+by students to upload theit assessments, view the results of the automated
+tests and view their final grade and feedback.
+
+Assessments uploaded via the web UI, are stored in the repository, on the
+\emph{Storer}. Each homework is archived in a Git repository. A student can
+submit several revisions of the same assessment, each is tested, but only
+the last one (current one) is displayed in the UI. The Storer manages a
+queue of assessments that will be send out for checking. This component is
+a collection of scripts written in Python or Bash and require 3rd party
+modules like PyVix, an API for managing VMware virtual machines. Also on
+the Storer, the tests for each homework are stored.
+
+The submitted assessments from the queue on the Storer are passed to the
+\emph{Tester}. The Tester has one or more virtual machines (VMware in the
+current implementation) that can be started. After a fresh machine is
+started, the generic homework tests are uploaded to the virtual machine,
+then the submitted assessment. Both the tests and the submitted assessment
+is compiled and the test is ran. The output of the tests is saved, along
+with other system logs (like kernel logs in dmesg). The results are passed
+back to the Stored, from where the UI can hand the results to the students.
+
+
+

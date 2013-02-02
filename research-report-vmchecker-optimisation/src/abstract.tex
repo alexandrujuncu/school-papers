@@ -1,0 +1,26 @@
+% vim: set tw=78 sts=2 sw=2 ts=8 aw et ai:
+The use of an automated testing system for homeworks or for contest
+submissions is is commonly used in the academic world, specially in
+computer science related fields. Such systems offer an efficient way of
+collecting and storing homeworks and a quick, impartial, deterministic
+and transparent way of grading them. An automated testing speeds up
+considerably the grading time as compared to manual grading.
+
+A secure implementation of a testing systems need some sort of containment
+of the environment in which each test is ran. Different types of
+virtualisation technologies can be used, from chroot jails to full
+virtualisation, depending on the requirements of the tests.
+
+An example of an automated homework testing system is a project called
+\emph{VMchecker}. This open source tool is made up of several components,
+among which a virtualisation infrastructure based on VMware Workstation.
+VMchecker has been successfully deployed in academic environments and is
+currently serving over 500 students each semester.
+
+The following paper is focused around optimising VMchecker in order to
+better prioritise homework submissions to achieve faster grading times and
+scaling the infrastructure to support parallel homework evaluations.
+
+In order to do this, statistics about the current implementation of
+VMchecker has been gathered Following the analysis of the data, a new
+algorithm is being proposed for implementation.

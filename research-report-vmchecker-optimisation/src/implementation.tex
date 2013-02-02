@@ -1,0 +1,76 @@
+% vim: set tw=78 sts=2 sw=2 ts=8 aw et ai:
+
+The main bottleneck of the infrastructure is the Tester. The current
+implementation of the Tester makes it possible for only one  VMware virtual
+machine to be used at one time. This means that all submissions to be
+tested need to wait in the same queue. Along with the First Come First
+Serve policy, means that submissions at the back of the queue get processed
+very slow.
+
+The problem is similar to the one that network traffic faces. Internet
+packets are different, some are big, some are small, some are processed
+fast, some are processed slow. The default way that packets are routed is
+on a First Come First Serve bases, which means that some packets get
+treated worse than others. Without a Quality of Services implemented,
+theres is no prediction of the treatment of important or unimportant
+packets.
+
+From data analysed, current instance of VMchecker has three types of
+homework tests:
+\begin{itemize}
+\item simple tests that run only in userspace an require basic containment
+of the test process
+\item system or kernel level tests that require root access to the entire
+virtual machine
+\item full system tests that need the entire virtual machine to be taken as
+input
+\end{itemize}
+
+The first step of optimising VMchecker is to mark these types of
+assessments by the above categories. This means that the Tester will know
+what is the estimated time of the testing and can be able to choose smaller
+tests in front of bigger tests. If two simple tests that take tens of
+seconds are submitted after a test that needs the entire virtual machine to
+be copied, all of these will take a matter of minutes in average to get the
+result. But if a QoS is implemented, the Tester can choose to run the
+smaller tests first, even though the larger test was submitted first.
+
+But as long as the tester can only run a single virtual machine, the queue
+can still become long enough to provide bad result times. The obvious
+solution is to run multiple virtual machines at the same time so that
+several tests can be run simultaneously. But this require adequate hardware
+resources.
+
+Running more than one virtual machine on the Tester offers another
+optimisation: provisioning machines. In the current implementation every
+time a submission is made, the tester start the correct virtual machine for
+that test. This takes time because the machine needs to be started or
+resumed from a snapshot on the spot. Provisioning machines means that fresh
+virtual machines are already started and ready to receive tests to be ran.
+In the best case scenario, anytime a test needs to run, a machine is up and
+running and is instantly ready to run the test. The machine is cleanup
+(closed) after the test is done, but this won't affect the next test,
+because that next test will run on another provisioned machine.
+
+But the idea of provisioning brings another question: how many machines to
+keep running and of what type? Keeping too many machines running that
+aren't needed means that if only one is (or a few are) used, that (or
+those) will perform bad because they need to share resources with the other
+that are idle.
+
+The proposed algorithm is based on all the optimisations mentioned above.
+First of all, the types of virtual machines should vary. Simple tests can
+be run on OpenVZ or LXC, rather than VMware full virtualization. The full
+system tests could be run on other full virtualization or
+paravirtualization like VirtualBox or Xen. Depending on the tests, the
+appropriate machine should be used, because an OpenVZ machine is easier to
+start and clean compared to a VMware machine, and if a test doesn't need
+more than userspace access, resources shouldn't be wasted on it.
+
+Machines should be already started before tests are submitted, meaning that
+multiple machines need to be started at the same time. What machines should
+be provisioned need to be chosen using an heuristic that takes under
+consideration the deadlines of assignments and the live requests made by
+the users. If in one day, the number of VMware machines are higher than
+usual, OpenVZ machines could be stopped to reallocate resources to the
+needed ones.
