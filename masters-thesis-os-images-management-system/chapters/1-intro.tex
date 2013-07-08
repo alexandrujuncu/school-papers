@@ -1,0 +1,256 @@
+% vim: set tw=78 sts=2 sw=2 ts=8 aw et ai:
+
+\chapter{Introduction}\label{ch:intro} \bigskip
+
+
+Modern educational institutions, like most institutions today, rely
+heavily on the IT infrastructure to provide quality services for
+students. The computer network for such institution needs to scale to
+the same level as a large company campus network, the students being the
+equivalent of production employees. The infrastructure needs to provided
+the needed service for the students to efficiently accomplish their
+goals of learning new information aided by the modern technology
+available.
+
+
+But there are some things that make schools or universities computer
+setups different from an enterprise level company. While in a company
+each employee has its workstation setup suited for his or her needs,
+with the software required for his or her job role, computers in schools
+and universities are build for massive identical deployments. For
+example, each computer lab, of 10-20 computers, needs to be set up for a
+specific course. A computer would be used for and hour or two by a
+student, and then another student needs to use it, preferably, in the
+same conditions as the previous student. While a setup for 10-20
+computers with identical images could be done with some effort, this has
+to be done with the idea in mind that the lifespan of the image would be
+for about one semester, until another course needs the lab.
+
+These kinds of conditions make IT administrators of educational
+environments think in another way than the IT staff in a company. Things
+need to be optimised so that the maximum efficiency could be obtained
+with as little effort as possible, because the setup needs to scale to
+tens of computer labs.
+
+Higher education schools could also have needs for server rooms that
+provide students places to run projects on. In research universities,
+processing power is essentials for research professors and students to
+run their experiments.
+
+
+The following paper will present in more detail an university
+environment with its current and future needs, as well as present
+proposals for using current available technologies to better administer
+the available equipment and to create opportunities for new features to
+be available to students and teachers. It will focus on the current
+needs and proposed enhancements specific to the \emph{Computer Science
+and Engineering Department of the University POLITEHNICA of Bucharest},
+but the information could be useful for departments of universities with
+similar conditions.
+
+\section{Current implementation and technologies used}
+
+There are a few requirements that an administrator of a computer
+laboratory room needs to take into consideration.
+
+First of all, the computer's operating system needs to be prepared for
+the activities that will be conducted in the room. This could impose the
+operating system itself (for example, for a Linux class you will prefer
+not to install Windows on it), or just the applications needed (for
+example, for a programming class you need to install IDE software).
+
+
+Once you have the requirement list, you start installing the system.
+When dealing with a large number or workstations, preparing each station
+by itself would take a huge effort and a large number of work hours.
+This is where imaging software solutions come in. Software like
+\emph{UDPCast}, Norton Ghost or FOG could provide scalable operating
+system installation by using a single system image and multiplying it to
+the rest of the systems either by a large mobile media storage or using
+the existing local area network.
+
+The multiplication of the image brings another need in a class: the need
+that every student has the same environment to work in as the next one.
+This is important because the teacher doesn't need to waste time to
+debug something that works for one student but doesn't for another
+thinking that it's because one workstation is different than the other.
+And the student doesn't need to feel lucky or unlucky while he or she is
+working on a task because on the colleague's workstation a certain
+software is installed and on his or her workstation, that tool isn't.
+
+Multiplying the same operating system image to all workstations solves
+that issue, but only for the first group of students that use those
+workstations. Laboratory rooms change groups of students maybe 10 times
+a day. Each group should have the same conditions as the previous group
+that used the workstations. This is where an operating system freezing
+solution comes in. A freezing system would make each boot of an
+operating system the same as the previous one by the removing or
+reverting the changes made between two restarts.
+
+
+One other consideration that needs to be considered in advance is the
+need for special equipment in the laboratory. For example there are labs
+where a tasks could ask one student to administer 3 stations that are
+connected to each other by network. Due to limited physical resources,
+such laboratories are hard to implement. This is where \emph{virtual
+machines} could provide solutions. A single physical system could host
+several virtual machines configured in any needed topology. Special
+equipment such as routers could be emulated in virtual appliances rather
+than be physically installed in the laboratory room.
+
+\section{Limitations of current deployment}
+
+
+Although current procedures for maintaining a deployment of a large
+number of computer lab room have proven themselves useful in raising
+efficiency of administration costs, they do, however, have some
+drawbacks.
+
+The imaging system, using UDPCast has the issue that is hard to
+administer without a central control point. By design, UDPCast is a set
+of programs that need to be activated individually, on each workstation.
+This is usually done by using either a LiveCD or a LiveUSB stick that
+contains the UDPCast mini Linux Distribution and having to go to each
+workstation and booting it, configuring either the client or the server
+and starting the imaging process manually on each machine.
+
+This could be speeded up by having the image for the UDPCast (kernel and
+initial RAM disk) stored on the harddrive of the physical machines, but
+this is a chicken-before-egg problem because you have to first put that
+image on each station. Booting the UDPCast image off the network using
+PXE could be more efficient, but that is still limited by the fact that
+you have to make every workstation boot off PXE and not local disk and
+the fact that setting up a PXE server in the local network is a
+challenge by itself.
+
+Some fixes for problems regarding UDPCast have been presented in an
+earlier related work \cite{paper:me}, proposing a centralized
+architecture built around UDPCast. Although easier to manage, that
+approach is also limited to problems related to \ac{PXE} and the need
+for a communication channel between clients (the workstation) and a
+server (the central control point).
+
+
+The freezing system is good because it lowers the need for re-imaging a
+large number of workstation a certain period of time, keeping the same
+environment for all workstations in a room. The weakness of the freezing
+system is also in its architecture.
+
+The operating system is "froze" by using a freezing partition (it can
+also be just a file on the partition) to store the modifications done to
+the current session. The files of the base image are never modified, all
+that is modified are the files on the freezing partition. But for the
+files to exist on the freezing partition, they need to be copied from
+the base partition. This introduces a large IO overhead. When accessing
+large files in the operating system, they have to first be copied to the
+freezing partition that introduces latency between access time and data
+available time.
+
+
+Virtual machines that could be copied to each workstation, having inside
+the contained environment needed, could replace the need for having the
+need to keep the same operating system image on all workstations. Each
+workstation could have its own operating system and provide a
+virtualization hypervisor to run a standard virtual machine. This would
+make the freezing system useless and lower the need for system-wide
+reimaging.
+
+But because modern operating system have grown in requirements,
+especially in hard disk space size needed, there is the problem of
+deploying them across all workstations. There is also the limitations of
+some older workstation that don't have the physical resources to
+smoothly run fully functional virtual machines.
+
+A special mention of a deployment need at UPB is the \emph{VMChecker}
+infrastructure. Currently not connected to the laboratory
+infrastructure, it's a set of servers used in automated homework
+checking. The system uses virtual machines that provide an independent
+environment of testing of student homework assignments. The virtual
+machines used the automated system have ties to the ones used in student
+classrooms.
+
+\section{New technologies and procedure optimizations}
+
+
+Technological innovations bring new opportunities for experimenting
+towards improving workflow of administering the given environment. Such
+innovations include new operating system features and new software ideas
+but also hardware improvements for computer systems and advances in
+protocols for the network that connects the computers together.
+
+
+\emph{Virtualization} is one of the most fast growing market in computer
+science and computer engineering. Processor producing companies,
+software companies, application and kernel developers are investing
+time, effort and money into providing better virtualization solutions.
+
+Intel and AMD are already shipping all new processors with their new
+hardware virtualization technologies (\emph{\ac{Intel VT}} and
+\emph{\ac{AMD-V}}).
+Other hardware component companies are investing in technologies for
+assisting virtualization such as Pass-through component virtualization.
+
+On the operating system side, system and kernel developers are improving
+all virtualization solusions. While the open source community are
+pushing projects like \emph{\ac{LXC}/OpenVZ}, \emph{\ac{Xen}} and
+\emph{\ac{KVM}},
+companies like VMware are investing in their own proprietary approaches.
+
+These technologies are brought together and controlled by management
+software that makes administration of a large number of virtual machines
+and their foundation, the pool of physical machines, as easy and as
+transparent to the user as possible. This idea has been introduced to
+the world as the notion of \emph{Cloud computing} that puts emphasis on
+better hardware resources utilization, easy provisioning and security
+through backup and quick migration.
+
+The push towards distributed systems is made possible because of the
+advances of the processing power of each node and also the advances in
+networking technologies that connect the nodes. Gigibit Ethernet is
+becoming a standard for the \ac{LAN}. This makes not only transferring
+large amounts of data over the network faster, but also with less
+latency. This is what allows computers to act like terminals and have
+the data not only on the local system, but over the network, either on a
+nearby workstation or on a remote server.
+
+But one of the most important new technology, and one of the main focus
+of this thesis is the introduction of management tools that are both in
+software and in hardware. This makes administration of a large network
+scalable. Such a technology is Intel's  \emph{vPro}. This will be
+discussed in more detail in later chapters.
+
+\section{Purpose of this thesis}
+
+This paper proposes an architecture to be used in deployments of large
+computer deployments for educational purposes. The plan is to use a
+distributed approach of processing and data storage using classroom
+workstations as the nodes.
+
+The workload of the nodes will be in the form of hypervisors for virtual
+machines running on those physical systems. The network will be used for
+distributing the virtual machines and keeping them synchronized to
+provide an homogeneous environment for the users.
+
+The virtual machines will be available as a pool of template machines,
+each template made for a certain task (in this case, a specific
+classroom environment).
+
+The hypervisors will be Linux-basses machines using open source
+technologies like Qemu-KVM, LXC and Xen. The software solutions will be
+assisted by hardware virtualization technologies like Intel-VT.
+
+The management of the hardware infrastructure will be done using the
+remote management solutions provided by Intel vPro technology.
+
+For the massive data transmission needed for imaging a cluster of
+workstations, open source solutions such as UDPCast and rsync or SMB or
+NFS are used.
+
+The following chapters will provide a more in depth description of the
+proposed optimizations.
+
+The thesis will also provide a case study of how to use the proposed
+infrastructure to be used for projects such as VMChecker that could be
+made more efficient by scaling its physical resources. The case study
+proposing provisioning unused physical machines from the computer
+laboratories as clusters for VMChecker.

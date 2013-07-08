@@ -1,0 +1,66 @@
+% vim: set tw=78 sts=2 sw=2 ts=8 aw et ai:
+
+\chapter{Conclustions}\label{ch:conclusions}
+\bigskip
+
+
+The previous chapters discussed many technologies and
+protocols that each provided needed features. But an efficient
+management procedure would make use of a combination of all of them.
+The following are some recommended procedures that resulted from the
+research and experimenting done.
+
+First of all, the old freezing system should be phased out. Because of
+its lack of current development it has become inefficient for the
+present needs. The "clean environment" features could be replaced by
+running Live Linux distributions and using virtual machines.
+
+Image multiplication actions that take place at least once per semester
+or at every course beginning should be heavily reduced. Every
+workstation should be imaged with a standard operating system that could
+self update itself.
+
+The standard operating system should be ready do use virtualization
+software, like \ac{KVM} to run virtual systems if needed. It should also
+have a pool of Live distribution iso files available for Grub2. The iso
+as well as the virtual machines should be kept up to date by
+synchronizing over the network with protocols such as \ac{NFS} or rsync.
+
+In case a machine is malfunctioning, it could be remotely accessed using
+vPro AMT and fixed remotely.
+
+As we saw, using the approaches presented, projects can benefit from new
+features, like VMchecker. Having a cluster or workstations that could be
+used non stop and having a easy to use administration system to
+provision resources and push new operating system images towards them in
+order to accomplish a desired task, could greatly increase the efficiency
+of hardware utilization and lowering costs processing power.
+
+
+\section{Future work}
+
+Being the newest technology presented, Intel's vPro AMT is a framework
+where new research could be done. Because it is new, there is a lack of
+software that exploits its features. But because it is a feature-full
+framework many new ideas could be built on top.
+
+As discussed previously, a scheduling system that would push images
+automatically to workstations following timetables in a database could
+reduce some manual tasks being done by an administrator that wants to
+provision a pool of systems. Such a software project doesn't exist at
+the time of writing this thesis and could be a starting point for a new
+project.
+
+The idea of a self-updating system has been discussed in this paper, in
+order to make workstations automatically use the latest versions of
+system images (either Live systems or virtual machines). Going further,
+a self-repairing system could take one more set towards eliminating jobs
+that an administrator would do. In a distributed self-repairing system,
+one node could verify is another is malfunctioning and use its own
+system to mirror the other node.
+
+As the VMchecker case study has shown, there are some types of projects
+that would benefit from a model where services could benefit on-the-fly
+from workstations that aren't used for something else. Searching for
+other case studies could prove to be important research.
+

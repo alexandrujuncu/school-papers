@@ -1,0 +1,111 @@
+%*******************************************************
+% Table of Contents
+%*******************************************************
+%\phantomsection
+\refstepcounter{dummy}
+\pdfbookmark[1]{\contentsname}{tableofcontents}
+\setcounter{tocdepth}{2} % <-- 2 includes up to subsections in the ToC
+\setcounter{secnumdepth}{3} % <-- 3 numbers up to subsubsections
+\manualmark
+\markboth{\spacedlowsmallcaps{\contentsname}}{\spacedlowsmallcaps{\contentsname}}
+\tableofcontents 
+\automark[section]{chapter}
+\renewcommand{\chaptermark}[1]{\markboth{\spacedlowsmallcaps{#1}}{\spacedlowsmallcaps{#1}}}
+\renewcommand{\sectionmark}[1]{\markright{\thesection\enspace\spacedlowsmallcaps{#1}}}%*******************************************************
+% List of Figures and of the Tables
+%*******************************************************
+\clearpage
+
+\begingroup
+    \let\clearpage\relax
+    \let\cleardoublepage\relax
+    \let\cleardoublepage\relax
+    %*******************************************************
+    % List of Figures
+    %*******************************************************    
+    %\phantomsection
+    \refstepcounter{dummy}
+    %\addcontentsline{toc}{chapter}{\listfigurename}
+    \pdfbookmark[1]{\listfigurename}{lof}
+    \listoffigures
+
+    \vspace*{8ex}
+
+    %*******************************************************
+    % List of Tables
+    %*******************************************************
+    %\phantomsection
+    \refstepcounter{dummy}
+    %\addcontentsline{toc}{chapter}{\listtablename}
+    \pdfbookmark[1]{\listtablename}{lot}
+    \listoftables
+
+    \vspace*{8ex}
+%   \newpage
+
+    %*******************************************************
+    % List of Listings
+    %*******************************************************      
+    %\phantomsection
+    \refstepcounter{dummy}
+    %\addcontentsline{toc}{chapter}{\lstlistlistingname}
+    \pdfbookmark[1]{\lstlistlistingname}{lol}
+    \lstlistoflistings
+
+    \vspace*{8ex}
+
+    %*******************************************************
+    % Acronyms
+    %*******************************************************
+    %\phantomsection
+    \refstepcounter{dummy}
+    \pdfbookmark[1]{Acronyms}{acronyms}
+    \markboth{\spacedlowsmallcaps{Acronyms and Keywords}}{\spacedlowsmallcaps{Acronyms and Keywords}}
+    \chapter*{Acronyms and Keywords}
+    \begin{acronym}[UML]
+	\acro{AMD-V}{Hardware Virtualization tehnology from AMD}
+	\acro{AMT}{Intel Active Management Technology}
+	\acro{API}{Application Programming Interface}
+	\acro{AS}{Autonomous System}
+	\acro{AUFS}{AnotherUnionFS}
+	\acro{BIOS}{Basic Input Output System}
+	\acro{CLI}{Command Line Interface}
+	\acro{COW}{Copy-on-write}
+	\acro{DHCP}{Dynamic Host Configuration Protocol}
+	\acro{FS}{File system}
+	\acro{GPL}{Generic Public License}
+	\acro{GUI}{Graphical User Interface}
+	\acro{GRUB}{GRand Unified Bootloader}
+	\acro{GZIP}{GNU zip}
+	\acro{HDD}{Hard Disk Drive}
+	\acro{IANA}{Internet Assigned Numbers Authority}
+	\acro{IGMP}{Internet Group Management Protocol}
+	\acro{IO}{Input/Output}
+	\acro{IP}{Internet Protocol}
+	\acro{Intel VT}{Hardware Virtualization tehnology from Intel}
+	\acro{KVM}{Kernel-based Virtual Machine}
+	\acro{LAN}{Local Area Network}
+	\acro{LXC}{LinuX Containers - operating system level virtualization}
+	\acro{LZOP}{Lempel-Ziv-Oberhumer compresion}
+	\acro{MBR}{Master Boot Record}
+	\acro{NFS}{Network File System}
+	\acro{NIC}{Network Interface Card}
+	\acro{NTP}{Network Time Protocol}
+	\acro{OS}{Operating System}
+	\acro{OpenVZ}{operating system level virtualization}
+	\acro{PIM}{Protocol Independent Multicast}
+	\acro{PXE}{Preboot Execution Environment}
+	\acro{RPF}{Reverse Path Forwarding}
+	\acro{TCP}{Transmission Control Protocol}
+	\acro{TFTP}{Trivial File Transfer Protocol}
+	\acro{TTL}{Time To Live}
+	\acro{UDP}{User Datagram Protocol}
+	\acro{UML}{Unified Modeling Language}
+	\acro{USB}{Universal Serial Bus}
+	\acro{VNC}{Virtual Network Computing}
+	\acro{VFS}{Virtual File System}
+	\acro{Xen}{Para-virtualization technology}
+    \end{acronym}
+\endgroup
+
+\cleardoublepage

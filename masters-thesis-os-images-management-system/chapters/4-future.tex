@@ -1,0 +1,151 @@
+% vim: set tw=78 sts=2 sw=2 ts=8 aw et ai:
+
+\chapter{Future available features}\label{ch:future}
+\bigskip
+
+The ability of deploying with ease of operating system images on
+available workstations brings the possibility of reusing hardware that
+in other situations would be unused. This could bring a cost efficient
+way of using current hardware.
+
+In a normal research university, you have clusters of servers installed
+with the purpose of running computational tasks. These are used whenever
+a project needs processing and storage power. Among many projects
+running on UPB servers, is VMchecker.
+
+\section{VMchecker}
+
+\emph{VMchecker} is an open sources project started by a group of
+teachers and students from the Computer Science Department at the
+Politehnica University of Bucharest. The goal was to automate testing of
+homework from the Operating Systems and Compilers courses. Since then,
+it was been adopted by several other courses, that had assessments
+ranging from high level programming, to network simulations to kernel
+programming.
+
+The architecture of VMchecker is very modular and uses several
+technologies. The infrastructure is organized in three components:
+\begin{itemize}
+\item vmchecker-ui
+\item vmchecker-storer
+\item vmchecker-tester
+\end{itemize}
+
+The \emph{User Interface} is a web interfaces based on Google Web Toolkit,
+a framework with a Java backend and a JavaScript frontend. The UI is used
+by students to upload theit assessments, view the results of the automated
+tests and view their final grade and feedback.
+
+Assessments uploaded via the web UI, are stored in the repository, on the
+\emph{Storer}. Each homework is archived in a Git repository. A student can
+submit several revisions of the same assessment, each is tested, but only
+the last one (current one) is displayed in the UI. The Storer manages a
+queue of assessments that will be send out for checking. This component is
+a collection of scripts written in Python or Bash and require 3rd party
+modules like PyVix, an API for managing VMware virtual machines. Also on
+the Storer, the tests for each homework are stored.
+
+The submitted assessments from the queue on the Storer are passed to the
+\emph{Tester}. The Tester has one or more virtual machines (VMware in the
+current implementation) that can be started. After a fresh machine is
+started, the generic homework tests are uploaded to the virtual machine,
+then the submitted assessment. Both the tests and the submitted assessment
+is compiled and the test is ran. The output of the tests is saved, along
+with other system logs (like kernel logs in dmesg). The results are passed
+back to the Stored, from where the UI can hand the results to the students.
+
+\section{Distributing VMchecker tester nodes}
+
+The main bottleneck of the infrastructure is the Tester. The current
+implementation of the Tester makes it possible for only one  VMware virtual
+machine to be used at one time. This means that all submissions to be
+tested need to wait in the same queue. Along with the First Come First
+Serve policy, means that submissions at the back of the queue get processed
+very slow.
+
+The problem is similar to the one that network traffic faces. Internet
+packets are different, some are big, some are small, some are processed
+fast, some are processed slow. The default way that packets are routed is
+on a First Come First Serve bases, which means that some packets get
+treated worse than others. Without a Quality of Services implemented,
+theres is no prediction of the treatment of important or unimportant
+packets.
+
+From data analysed, current instance of VMchecker has three types of
+homework tests:
+\begin{itemize}
+\item simple tests that run only in userspace an require basic containment
+of the test process
+\item system or kernel level tests that require root access to the entire
+virtual machine
+\item full system tests that need the entire virtual machine to be taken as
+input
+\end{itemize}
+
+The first step of optimising VMchecker is to mark these types of
+assessments by the above categories. This means that the Tester will know
+what is the estimated time of the testing and can be able to choose smaller
+tests in front of bigger tests. If two simple tests that take tens of
+seconds are submitted after a test that needs the entire virtual machine to
+be copied, all of these will take a matter of minutes in average to get the
+result. But if a QoS is implemented, the Tester can choose to run the
+smaller tests first, even though the larger test was submitted first.
+
+But as long as the tester can only run a single virtual machine, the queue
+can still become long enough to provide bad result times. The obvious
+solution is to run multiple virtual machines at the same time so that
+several tests can be run simultaneously. But this require adequate hardware
+resources.
+
+Running more than one virtual machine on the Tester offers another
+optimisation: provisioning machines. In the current implementation every
+time a submission is made, the tester start the correct virtual machine for
+that test. This takes time because the machine needs to be started or
+resumed from a snapshot on the spot. Provisioning machines means that fresh
+virtual machines are already started and ready to receive tests to be ran.
+In the best case scenario, anytime a test needs to run, a machine is up and
+running and is instantly ready to run the test. The machine is cleanup
+(closed) after the test is done, but this won't affect the next test,
+because that next test will run on another provisioned machine.
+
+But the idea of provisioning brings another question: how many machines to
+keep running and of what type? Keeping too many machines running that
+aren't needed means that if only one is (or a few are) used, that (or
+those) will perform bad because they need to share resources with the other
+that are idle.
+
+The proposed algorithm is based on all the optimisations mentioned above.
+First of all, the types of virtual machines should vary. Simple tests can
+be run on OpenVZ or LXC, rather than VMware full virtualization. The full
+system tests could be run on other full virtualization or
+paravirtualization like VirtualBox or Xen. Depending on the tests, the
+appropriate machine should be used, because an OpenVZ machine is easier to
+start and clean compared to a VMware machine, and if a test doesn't need
+more than userspace access, resources shouldn't be wasted on it.
+
+Machines should be already started before tests are submitted, meaning that
+multiple machines need to be started at the same time. What machines should
+be provisioned need to be chosen using an heuristic that takes under
+consideration the deadlines of assignments and the live requests made by
+the users. If in one day, the number of VMware machines are higher than
+usual, OpenVZ machines could be stopped to reallocate resources to the
+needed ones.
+
+A related thesis \cite{paper:vmchecker} details the idea of distributing
+the Tester infrastructure over several nodes and also the idea of using
+several virtualization solutions to increase testing speed.
+
+
+\section{Using workstations as VMchecker nodes}
+
+Workstations from computer laboratories are mostly used during daytime
+for the students to do their tasks. The reset of the time the are
+usually shut down. The processing power of those stations could be
+harnessed during the off work hours.
+
+As seen earlier, using vPro \ac{AMT}, booting a live distribution on the
+network is an easy task. The VMchecker server could command the
+laboratory workstations to boot up a special vmchecker image that
+contains the Tester component. This way, VMchecker could have access to
+tens of Testers that would greatly improve the efficiency  of the
+automated grading system.
